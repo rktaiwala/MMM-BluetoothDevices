@@ -8,6 +8,7 @@ const hub = require('./src');
 
 module.exports = NodeHelper.create({
   config: {},
+  type:null,
   started: false,
   devices: {},
   dongle: null,
@@ -16,7 +17,7 @@ module.exports = NodeHelper.create({
     console.log(`Starting node helper for: ${this.name}`);
   },
 
-  startHub(config) {
+  startHub(config,type) {
     if (this.started) {
       return;
     }
@@ -26,6 +27,7 @@ module.exports = NodeHelper.create({
     console.log(`${this.name} starting hub`);
 
     this.config = config;
+    this.type = type;
     this.dongle = hub.initialize(this.name, this.config);
 
     this.dongle.on('setupCompleted', () => {
@@ -34,8 +36,12 @@ module.exports = NodeHelper.create({
 
     this.dongle.on('deviceUpdate', ({ device, data }) => {
       this.devices[device.name] = { device, data };
-
-      this.sendSocketNotification('FETCH_TOOTHBRUSHES_RESULTS', this.devices);
+      if (this.type === 'FETCH_TOOTHBRUSHES') {
+        this.sendSocketNotification('FETCH_TOOTHBRUSHES_RESULTS', this.devices);
+      }
+      if (this.type === 'FETCH_SMARTMATIC') {
+        this.sendSocketNotification('FETCH_SMARTMATIC_RESULTS', this.devices);
+      }
     });
   },
 
@@ -53,9 +59,14 @@ module.exports = NodeHelper.create({
 
   socketNotificationReceived(notification, payload) {
     if (notification === 'FETCH_TOOTHBRUSHES') {
-      this.startHub(payload);
+      this.startHub(payload,notification);
 
       this.sendSocketNotification('FETCH_TOOTHBRUSHES_RESULTS', this.devices);
+    }
+    if (notification === 'FETCH_SMARTMATIC') {
+      this.startHub(payload,notification);
+
+      this.sendSocketNotification('FETCH_SMARTMATIC_RESULTS', this.devices);
     }
   },
 });
