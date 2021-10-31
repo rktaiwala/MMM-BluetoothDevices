@@ -1,9 +1,10 @@
 'use strict';
 
 const OralBToothbrush = require('./OralBToothbrush');
-
+const SmartMatic = require('./SmartMatic');
 const devices = {
   OralBToothbrush,
+  SmartMatic,
 };
 
 /**
