@@ -52,6 +52,8 @@ Module.register('MMM-BluetoothDevices', {
 
       if (deviceType === 'OralBToothbrush') {
         row.appendChild(this.renderToothbrush(deviceKey));
+      }else if (deviceType === 'SmartMatic') {
+        row.appendChild(this.renderSmartMatic(deviceKey));
       } else {
         throw new Error(`Unknown device type: ${deviceType}`);
       }
@@ -62,7 +64,43 @@ Module.register('MMM-BluetoothDevices', {
 
     return wrapper;
   },
+  renderSmartMatic(deviceKey){
+    const device = this.devices[deviceKey];
+    const deviceTd = document.createElement('td');
+    deviceTd.classList.add('toothbrush');
+    deviceTd.style.textAlign = 'center';
+    
+    const deviceLabel = document.createElement('div');
+    deviceLabel.classList.add('title');
+    deviceLabel.classList.add('small');
+    deviceLabel.innerText = device.device[this.config.layout.title.key];
 
+    const dataContainer = document.createElement('div');
+    dataContainer.classList.add('small');
+    dataContainer.classList.add('light');
+    
+      const field = document.createElement('div');
+      field.innerText = `${device.data}`;
+      dataContainer.appendChild(field);
+    
+
+    if (this.config.layout.title.position === 'top') {
+      deviceTd.appendChild(deviceLabel);
+    }
+    if (this.config.layout.data.position === 'top') {
+      deviceTd.appendChild(dataContainer);
+    }
+
+
+    if (this.config.layout.title.position === 'bottom') {
+      deviceTd.appendChild(deviceLabel);
+    }
+    if (this.config.layout.data.position === 'bottom') {
+      deviceTd.appendChild(dataContainer);
+    }
+
+    return deviceTd;
+  },
   renderToothbrush(deviceKey) {
     const device = this.devices[deviceKey];
     const deviceTd = document.createElement('td');
@@ -203,12 +241,29 @@ Module.register('MMM-BluetoothDevices', {
     this.hiders = {};
     this.loading = true;
 
-    this.sendSocketNotification('FETCH_TOOTHBRUSHES', this.config);
+    //this.sendSocketNotification('FETCH_TOOTHBRUSHES', this.config);
+    this.sendSocketNotification('FETCH_SMARTMATIC', this.config);
   },
 
   socketNotificationReceived(notification, payload) {
     if (notification === 'FETCH_TOOTHBRUSHES_RESULTS') {
       Log.info('MMM-Toothbrush: Got toothbrush results');
+      this.devices = payload;
+
+      for (const counterKey in this.counters) {
+        const counter = this.counters[counterKey];
+        clearInterval(counter.interval);
+      }
+
+      if (this.loading) {
+        this.loading = false;
+        this.updateDom(1000);
+      } else {
+        this.updateDom(0);
+      }
+    }
+    if (notification === 'FETCH_SMARTMATIC_RESULTS') {
+      Log.info('SmartMatic: Got smartmatic results');
       this.devices = payload;
 
       for (const counterKey in this.counters) {
