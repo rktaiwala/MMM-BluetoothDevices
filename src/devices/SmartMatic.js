@@ -57,10 +57,10 @@ class SmartMatic extends Device {
   constructor(options, logger) {
     super(options, logger);
 
-    this.BATTERY_TRACK_KEY = 'battery';
-    this.BATTERY_UUID = 'a0f0ff05-5047-4d53-8208-4f72616c2d42';
-    this.BATTERY_SERVICE = 'service001e';
-    this.BATTERY_CHARACTERISTIC = 'char002c';
+    this.BATTERY_TRACK_KEY = 'spray';
+    this.BATTERY_UUID = '6e400000-b5a3-f393-e0a9-e50e24dcca93';
+    this.BATTERY_SERVICE = '6e400003-b5a3-f393-e0a9-e50e24dcca93';
+    this.BATTERY_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca93';
     this.BATTERY_PATH = `${this.BATTERY_SERVICE}/${this.BATTERY_CHARACTERISTIC}`;
 
     if (this.tracks.includes(this.BATTERY_TRACK_KEY)) {
